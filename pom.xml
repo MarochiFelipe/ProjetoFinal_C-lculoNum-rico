@@ -60,7 +60,7 @@
                         <id>default-cli</id>
                         <configuration>
                             <mainClass>
-                                org.example.projetofinal_calcnumerico/org.example.projetofinal_calcnumerico.HelloApplication
+                                org.example.projetofinal_calcnumerico/org.example.projetofinal_calcnumerico.MainApplication
                             </mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
