@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox spacing="10" xmlns="http://javafx.com/javafx/21"
@@ -15,53 +10,5 @@
     <padding>
         <Insets top="20" right="20" bottom="20" left="20"/>
     </padding>
-
-    <Label text="Método"/>
-    <ComboBox fx:id="seletorMetodo" prefWidth="220"/>
-
-    <Label text="Função f(x)"/>
-    <TextField fx:id="campoFuncao" promptText="x^2 - 5"/>
-
-    <VBox fx:id="grupoDerivada" spacing="4">
-        <Label text="Derivada f'(x)"/>
-        <TextField fx:id="campoDerivada" promptText="2*x"/>
-    </VBox>
-
-    <HBox spacing="12">
-        <VBox spacing="4" HBox.hgrow="ALWAYS">
-            <Label fx:id="rotuloA" text="Limite inferior (a)"/>
-            <TextField fx:id="campoA" promptText="2"/>
-        </VBox>
-
-        <VBox fx:id="grupoB" spacing="4" HBox.hgrow="ALWAYS">
-            <Label fx:id="rotuloB" text="Limite superior (b)"/>
-            <TextField fx:id="campoB" promptText="3"/>
-        </VBox>
-    </HBox>
-
-    <HBox spacing="12">
-        <VBox spacing="4" HBox.hgrow="ALWAYS">
-            <Label fx:id="rotuloTolerancia" text="Tolerância do intervalo"/>
-            <TextField fx:id="campoTolerancia" promptText="0,01"/>
-        </VBox>
-
-        <VBox fx:id="grupoToleranciaFuncao" spacing="4" HBox.hgrow="ALWAYS">
-            <Label text="Tolerância para |f(x)|"/>
-            <TextField fx:id="campoToleranciaFuncao" promptText="0,01"/>
-        </VBox>
-
-        <VBox spacing="4" HBox.hgrow="ALWAYS">
-            <Label text="Máximo de iterações"/>
-            <TextField fx:id="campoMaxIteracoes" promptText="100"/>
-        </VBox>
-    </HBox>
-
-    <HBox spacing="10" alignment="CENTER_LEFT">
-        <Button fx:id="botaoCalcular" text="Calcular" onAction="#calcular"/>
-        <Label text="Casas decimais"/>
-        <ComboBox fx:id="seletorCasasDecimais" prefWidth="125"/>
-    </HBox>
-    <TextArea fx:id="areaResultado" editable="false" wrapText="false"
-              prefRowCount="6" VBox.vgrow="ALWAYS"
-              style="-fx-font-family: monospace;"/>
+    <Label text="Módulo de Raízes de Funções (em construção)"/>
 </VBox>
