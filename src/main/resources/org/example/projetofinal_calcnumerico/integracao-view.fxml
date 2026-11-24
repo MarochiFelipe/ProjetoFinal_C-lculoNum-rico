@@ -1,14 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox spacing="10" xmlns="http://javafx.com/javafx/21"
+<VBox spacing="12" xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.example.projetofinal_calcnumerico.controller.IntegracaoController">
+
     <padding>
         <Insets top="20" right="20" bottom="20" left="20"/>
     </padding>
-    <Label text="Módulo de Raízes de Funções (em construção)"/>
+
+    <Label text="Integração Numérica" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+
+    <HBox spacing="15">
+        <!-- Bloco 1: Métodos compostos com função f(x) -->
+        <VBox spacing="10" HBox.hgrow="ALWAYS"
+              style="-fx-border-color: #cccccc; -fx-border-radius: 4; -fx-padding: 12;">
+            <Label text="Métodos Compostos — Função f(x)" style="-fx-font-weight: bold;"/>
+
+            <GridPane hgap="8" vgap="8">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="120"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                </columnConstraints>
+
+                <Label text="Função f(x):" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <TextField fx:id="txtFuncao" promptText="Ex.: exp(x) ou x^2 + 1"
+                           GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                <Label text="Limite inferior (a):" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <TextField fx:id="txtA" promptText="Ex.: 0"
+                           GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                <Label text="Limite superior (b):" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <TextField fx:id="txtB" promptText="Ex.: 1"
+                           GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                <Label text="Subintervalos (m):" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                <TextField fx:id="txtM" promptText="Ex.: 10 (par para Simpson)"
+                           GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+            </GridPane>
+
+            <HBox spacing="8">
+                <Button text="Trapézio Repetida" onAction="#onCalcularTrapezioRepetido"/>
+                <Button text="1/3 de Simpson Repetida" onAction="#onCalcularSimpsonRepetido"/>
+            </HBox>
+        </VBox>
+
+        <!-- Bloco 2: Caso Discreto -->
+        <VBox spacing="10" HBox.hgrow="ALWAYS"
+              style="-fx-border-color: #cccccc; -fx-border-radius: 4; -fx-padding: 12;">
+            <Label text="Caso Discreto — Dados Tabelados" style="-fx-font-weight: bold;"/>
+            <Label text="Separe os valores por espaço ou ponto e vírgula (x em ordem crescente)."
+                   wrapText="true" style="-fx-text-fill: #555555; -fx-font-size: 11px;"/>
+
+            <GridPane hgap="8" vgap="8">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="100"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                </columnConstraints>
+
+                <Label text="Valores de x:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <TextField fx:id="txtXDiscreto" promptText="Ex.: 0 5 10 15 20"
+                           GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                <Label text="Valores de f(x):" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <TextField fx:id="txtYDiscreto" promptText="Ex.: 0 32.5 130 292.5 520"
+                           GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+            </GridPane>
+
+            <HBox spacing="8">
+                <Button text="Trapézio (Discreto)" onAction="#onCalcularTrapezioDiscreto"/>
+                <Button text="1/3 de Simpson (Discreto)" onAction="#onCalcularSimpsonDiscreto"/>
+            </HBox>
+        </VBox>
+    </HBox>
+
+    <HBox spacing="10">
+        <Button text="Limpar Campos" onAction="#onLimpar"/>
+    </HBox>
+
+    <Separator/>
+
+    <Label fx:id="lblStatus" wrapText="true" style="-fx-font-weight: bold;"/>
+
+    <TextArea fx:id="txtResultado" editable="false" VBox.vgrow="ALWAYS"
+              promptText="O resultado da integral e os pontos/subintervalos intermediários aparecerão aqui."
+              style="-fx-font-family: 'Monospaced'; -fx-font-size: 13px;"/>
 </VBox>
