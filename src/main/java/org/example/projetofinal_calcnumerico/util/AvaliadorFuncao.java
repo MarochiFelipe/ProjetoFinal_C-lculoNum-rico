@@ -4,6 +4,9 @@ import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import net.objecthunter.exp4j.function.Function;
 
+import java.util.List;
+import java.util.Map;
+
 public class AvaliadorFuncao {
 
     private static final Function LN = new Function("ln", 1) {
@@ -34,22 +37,28 @@ public class AvaliadorFuncao {
         }
     };
 
+    static final Map<String, Function> FUNCOES = Map.of("ln", LN, "log", LOG10, "sen", SEN, "tg", TG);
+
     private final Expression expressao;
 
     public AvaliadorFuncao(String textoFuncao) {
-        if (textoFuncao == null || textoFuncao.trim().isEmpty()) {
-            throw new IllegalArgumentException("A expressão da função não pode ficar vazia.");
-        }
-        String tratada = textoFuncao.trim().replace(",", ".");
+        String tratada = normalizar(textoFuncao);
         try {
             this.expressao = new ExpressionBuilder(tratada)
                     .variable("x")
-                    .functions(LN, LOG10, SEN, TG)
+                    .functions(List.copyOf(FUNCOES.values()))
                     .build();
         } catch (Exception e) {
             throw new IllegalArgumentException("Expressão inválida: '" + textoFuncao + "'. " +
                     "Use x como variável (ex.: x^3 - 9*x + 3, exp(-x^2) - cos(x), ln(x), log(x)).");
         }
+    }
+
+    static String normalizar(String textoFuncao) {
+        if (textoFuncao == null || textoFuncao.isBlank()) {
+            throw new IllegalArgumentException("A expressão da função não pode ficar vazia.");
+        }
+        return textoFuncao.trim().replace(",", ".");
     }
 
     public double avaliar(double x) {

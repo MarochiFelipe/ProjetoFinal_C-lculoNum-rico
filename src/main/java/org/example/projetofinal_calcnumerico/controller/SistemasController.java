@@ -2,6 +2,7 @@ package org.example.projetofinal_calcnumerico.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -25,6 +26,7 @@ public class SistemasController {
 
     @FXML private TextArea campoMatrizA;
     @FXML private TextArea campoVetorB;
+    @FXML private Label lblStatus;
     @FXML private TextArea areaResultado;
 
     @FXML
@@ -33,7 +35,9 @@ public class SistemasController {
         seletorMetodoSistemas.getSelectionModel().select(GAUSS);
         grupoGaussSeidel.visibleProperty().bind(seletorMetodoSistemas.valueProperty().isEqualTo(GAUSS_SEIDEL));
         grupoGaussSeidel.managedProperty().bind(grupoGaussSeidel.visibleProperty());
-        seletorMetodoSistemas.valueProperty().addListener((observavel, anterior, novo) -> areaResultado.clear());
+        lblStatus.visibleProperty().bind(lblStatus.textProperty().isNotEmpty());
+        lblStatus.managedProperty().bind(lblStatus.visibleProperty());
+        seletorMetodoSistemas.valueProperty().addListener((observavel, anterior, novo) -> limparResultado());
     }
 
     @FXML
@@ -43,8 +47,7 @@ public class SistemasController {
             double[] vetor = ConversorEntrada.lerVetor(campoVetorB.getText(), "Vetor b");
 
             if (vetor.length != matriz.length) {
-                throw new IllegalArgumentException("O vetor b deve ter " + matriz.length
-                        + " elementos, um para cada linha da matriz A. Recebidos: " + vetor.length + ".");
+                throw new IllegalArgumentException("O vetor b deve ter " + matriz.length + " elementos, um para cada linha da matriz A. Recebidos: " + vetor.length + ".");
             }
 
             ResultadoCalculo resultado = switch (seletorMetodoSistemas.getValue()) {
@@ -52,11 +55,36 @@ public class SistemasController {
                 case GAUSS_SEIDEL -> calcularGaussSeidel(matriz, vetor);
                 default -> EliminacaoGauss.calcular(matriz, vetor);
             };
-            areaResultado.setText(resultado.formatarParaTela());
+            mostrarResultado(resultado);
         } catch (IllegalArgumentException erro) {
-            areaResultado.setText("Erro: " + erro.getMessage());
+            mostrarResultado(ResultadoCalculo.erro(erro.getMessage()));
         }
+    }
+
+    private void mostrarResultado(ResultadoCalculo resultado) {
+        String resumo = resultado.getResultadoFinal().lines().findFirst().orElse("");
+        lblStatus.setStyle(resultado.isSucesso()
+                ? "-fx-font-weight: bold; -fx-text-fill: #1b5e20;"
+                : "-fx-font-weight: bold; -fx-text-fill: #b71c1c;");
+        lblStatus.setText(resultado.isSucesso() ? "Solução calculada." : "Erro: " + resumo);
+        areaResultado.setText(resultado.formatarParaTela());
         areaResultado.positionCaret(0);
+    }
+
+    private void limparResultado() {
+        lblStatus.setText("");
+        areaResultado.clear();
+    }
+
+    @FXML
+    private void onLimpar() {
+        campoMatrizA.clear();
+        campoVetorB.clear();
+        campoVetorInicial.clear();
+        campoToleranciaSeidel.clear();
+        campoMaxIteracoesSeidel.clear();
+        limparResultado();
+        campoMatrizA.requestFocus();
     }
 
     private ResultadoCalculo calcularGaussSeidel(double[][] matriz, double[] vetor) {

@@ -6,6 +6,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.example.projetofinal_calcnumerico.metodos.raizes.Bisseccao;
 import org.example.projetofinal_calcnumerico.metodos.raizes.CasasDecimais;
@@ -15,6 +16,7 @@ import org.example.projetofinal_calcnumerico.metodos.raizes.Secante;
 import org.example.projetofinal_calcnumerico.model.ResultadoCalculo;
 import org.example.projetofinal_calcnumerico.util.AvaliadorFuncao;
 import org.example.projetofinal_calcnumerico.util.ConversorEntrada;
+import org.example.projetofinal_calcnumerico.util.DerivadorFuncao;
 
 public class RaizesController {
     @FXML private TextField campoFuncao;
@@ -24,6 +26,7 @@ public class RaizesController {
     @FXML private TextField campoTolerancia;
     @FXML private TextField campoToleranciaFuncao;
     @FXML private TextField campoMaxIteracoes;
+    @FXML private Label lblStatus;
     @FXML private TextArea areaResultado;
 
     private static final String BISSECCAO = "Bissecção";
@@ -37,7 +40,7 @@ public class RaizesController {
     @FXML private Label rotuloB;
     @FXML private Label rotuloTolerancia;
     @FXML private VBox grupoB;
-    @FXML private VBox grupoDerivada;
+    @FXML private HBox grupoDerivada;
     @FXML private VBox grupoToleranciaFuncao;
     @FXML private Button botaoCalcular;
 
@@ -46,6 +49,15 @@ public class RaizesController {
         grupoB.managedProperty().bind(grupoB.visibleProperty());
         grupoDerivada.managedProperty().bind(grupoDerivada.visibleProperty());
         grupoToleranciaFuncao.managedProperty().bind(grupoToleranciaFuncao.visibleProperty());
+        lblStatus.visibleProperty().bind(lblStatus.textProperty().isNotEmpty());
+        lblStatus.managedProperty().bind(lblStatus.visibleProperty());
+
+        campoFuncao.textProperty().addListener((observavel, anterior, novo) -> {
+            limparResultado();
+            if (NEWTON.equals(seletorMetodo.getValue())) {
+                atualizarDerivada(novo);
+            }
+        });
 
         seletorMetodo.getItems().setAll(BISSECCAO, FALSA_POSICAO, SECANTE, NEWTON);
         seletorMetodo.valueProperty().addListener((observavel, anterior, novo) -> atualizarCampos(novo));
@@ -71,22 +83,53 @@ public class RaizesController {
 
         boolean disponivel = BISSECCAO.equals(metodo) || falsaPosicao || secante || newton;
         botaoCalcular.setDisable(!disponivel);
-        mostrarResultado(disponivel ? "" : "Método em implementação.");
+        limparResultado();
+        if (newton) {
+            atualizarDerivada(campoFuncao.getText());
+        }
+    }
+
+    private void atualizarDerivada(String textoFuncao) {
+        campoDerivada.setPromptText("Digite f(x) para gerar a derivada");
+        if (textoFuncao.isBlank()) {
+            campoDerivada.clear();
+            return;
+        }
+
+        try {
+            campoDerivada.setText(DerivadorFuncao.derivar(textoFuncao));
+        } catch (IllegalArgumentException erro) {
+            campoDerivada.clear();
+            campoDerivada.setPromptText(erro.getMessage());
+        }
     }
 
     private void mostrarResultado(ResultadoCalculo resultado) {
-        String texto = resultado.getResultadoFinal();
-        if (!resultado.isSucesso()) {
-            texto = "Erro: " + texto;
-        } else if (resultado.getDetalhes() != null && !resultado.getDetalhes().isBlank()) {
-            texto += "\n\n" + resultado.getDetalhes();
-        }
-        mostrarResultado(texto);
+        String resumo = resultado.getResultadoFinal().lines().findFirst().orElse("");
+        lblStatus.setStyle(resultado.isSucesso()
+                ? "-fx-font-weight: bold; -fx-text-fill: #1b5e20;"
+                : "-fx-font-weight: bold; -fx-text-fill: #b71c1c;");
+        lblStatus.setText(resultado.isSucesso() ? resumo : "Erro: " + resumo);
+        areaResultado.setText(resultado.formatarParaTela());
+        areaResultado.positionCaret(0);
     }
 
-    private void mostrarResultado(String texto) {
-        areaResultado.setText(texto);
-        areaResultado.positionCaret(0);
+    private void limparResultado() {
+        lblStatus.setText("");
+        areaResultado.clear();
+    }
+
+    @FXML
+    private void onLimpar() {
+        campoFuncao.clear();
+        campoDerivada.clear();
+        campoA.clear();
+        campoB.clear();
+        campoTolerancia.clear();
+        campoToleranciaFuncao.clear();
+        campoMaxIteracoes.clear();
+        limparResultado();
+        campoFuncao.requestFocus();
     }
 
     @FXML
@@ -104,6 +147,9 @@ public class RaizesController {
             ResultadoCalculo resultado;
 
             if (newton) {
+                if (campoDerivada.getText().isBlank()) {
+                    throw new IllegalArgumentException(campoDerivada.getPromptText());
+                }
                 AvaliadorFuncao derivada = new AvaliadorFuncao(campoDerivada.getText());
                 resultado = Newton.calcular(funcao, derivada, a, tolerancia, maxIteracoes, casasDecimais);
             } else {
